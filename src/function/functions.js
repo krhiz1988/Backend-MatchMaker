@@ -32,6 +32,8 @@ const registrarUsuario = async (usuario) => {
     telefono,
     direccion,
     comuna,
+    region,
+    tipo_user,
     password,
   } = usuario;
   const passwordEncriptada = bcrypt.hashSync(password);
@@ -44,10 +46,12 @@ const registrarUsuario = async (usuario) => {
     telefono,
     direccion,
     comuna,
+    region,
+    tipo_user,
     passwordEncriptada,
   ];
   const consulta =
-    "INSERT INTO usuarios values (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8)";
+    "INSERT INTO usuarios values (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
   await pool.query(consulta, values);
 };
 
@@ -60,6 +64,7 @@ const actualizarUsuario = async (usuario, id) => {
     telefono,
     direccion,
     comuna,
+    region,
     password,
   } = usuario;
   const passwordEncriptada = bcrypt.hashSync(password);
@@ -72,11 +77,12 @@ const actualizarUsuario = async (usuario, id) => {
     telefono,
     direccion,
     comuna,
+    region,
     password,
     id,
   ];
   const consulta =
-    "UPDATE usuarios SET nombre = $1, apellido_paterno = $2, rut = $3, email = $4, telefono = $5, direccion = $6, comuna = $7, password = $8 WHERE id = $9";
+    "UPDATE usuarios SET nombre = $1, apellido_paterno = $2, rut = $3, email = $4, telefono = $5, direccion = $6, comuna = $7, region = $8 password = $9 WHERE id = $10";
   await pool.query(consulta, values);
 };
 
@@ -123,7 +129,7 @@ const obtenerRecintosTenant = async (usuarios_id) => {
 };
 
 const obtenerRecintoUser = async (comuna) => {
-  const consulta = "SELECT * FROM recinto WHERE comuna = $1";
+  const consulta = "SELECT * FROM recinto";
   const values = [comuna];
   const { rowCount } = await pool.query(consulta, values);
   if (!rowCount) throw { code: 404, message: "No se encontraron recintos" };
