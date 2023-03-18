@@ -17,9 +17,11 @@ const indexController = {
   iniciarSesion: async (req, res) => {
     try {
       const { email, password } = req.body;
+      console.log('email:', email);
+      console.log('password:', password);
       const token = jwt.sign({ email }, "az_AZ", { expiresIn: "300" });
       await verificarUsuario(email, password);
-      res.send(token);
+      res.header('Authorization', `Bearer ${token}`).status(200).send({ token });
     } catch (e) {
       res.status(404).send(e.message);
     }

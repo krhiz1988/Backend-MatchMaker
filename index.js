@@ -1,4 +1,5 @@
 require('dotenv').config();
 const app = require('./src/app');
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`App is listening on http://localhost:${port}`))
+const port = process.env.PGPORT || 3000;
+app.listen(port, () => console.log(`La aplicacion fue exitosamente desplegada en el puerto:${port}`))
+

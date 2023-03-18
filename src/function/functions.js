@@ -2,26 +2,36 @@ const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const { Pool } = require("pg");
 
+const host = process.env.PGHOST || process.env.DB_HOST
+const user = process.env.PGUSER || process.env.DB_USER
+const database = process.env.PGDATABASE || process.env.DB_NAME
+const password = process.env.PGPASSWORD || process.env.DB_PASSWORD
+const name = process.env.DB_NAME
+
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: host,
+  user: user,
+  name: name,
+  password: password,
+  database: database,
   allowExitOnIdle: true,
 });
 
 const verificarUsuario = async (email, password) => {
   const values = [email];
   const consulta = "SELECT * FROM usuarios WHERE email = $1";
-  const {
-    rows: [usuario],
-    rowCount,
-  } = await pool.query(consulta, values);
-  const { password: passwordEncriptada } = usuario;
+  const { rows, rowCount } = await pool.query(consulta, values);
+  if (rowCount === 0) {
+    throw { code: 401, message: "Email o contraseña incorrecta" };
+  }
+
+  const passwordEncriptada = rows[0].password;
+
   const passwordEsCorrecta = bcrypt.compareSync(password, passwordEncriptada);
   if (!passwordEsCorrecta || !rowCount)
     throw { code: 401, message: "Email o contraseña incorrecta" };
 };
+
 
 const registrarUsuario = async (usuario) => {
   let {
@@ -82,7 +92,7 @@ const actualizarUsuario = async (usuario, id) => {
     id,
   ];
   const consulta =
-    "UPDATE usuarios SET nombre = $1, apellido_paterno = $2, rut = $3, email = $4, telefono = $5, direccion = $6, comuna = $7, region = $8 password = $9 WHERE id = $10";
+    "UPDATE usuarios SET nombre = $1, apellido_paterno = $2, rut = $3, email = $4, telefono = $5, direccion = $6, comuna = $7, region = $8, password = $9 WHERE id = $10";
   await pool.query(consulta, values);
 };
 
@@ -160,13 +170,13 @@ const actualizarCancha = async (cancha, id) => {
 };
 
 const registrarReserva = async (cancha) => {
-    let { cancha_id, recinto_id, fecha_inicio, fecha_termino, estado } = reserva;
-    const values = [cancha_id, recinto_id, fecha_inicio, fecha_termino, estado];
-    const consulta =
-      "INSERT INTO reserva values (DEFAULT, $1, $2, $3, $4, $5)";
-    await pool.query(consulta, values);
-  };
-  
+  let { cancha_id, recinto_id, fecha_inicio, fecha_termino, estado } = reserva;
+  const values = [cancha_id, recinto_id, fecha_inicio, fecha_termino, estado];
+  const consulta =
+    "INSERT INTO reserva values (DEFAULT, $1, $2, $3, $4, $5)";
+  await pool.query(consulta, values);
+};
+
 
 module.exports = {
   verificarUsuario,
