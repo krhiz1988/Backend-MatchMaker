@@ -6,10 +6,12 @@ const host = process.env.PGHOST || process.env.DB_HOST
 const user = process.env.PGUSER || process.env.DB_USER
 const database = process.env.PGDATABASE || process.env.DB_NAME
 const password = process.env.PGPASSWORD || process.env.DB_PASSWORD
+const port = process.env.PGPORT || process.env.DB_PORT
 
 const pool = new Pool({
   host: host,
   user: user,
+  port: port,
   password: password,
   database: database,
   allowExitOnIdle: true,
